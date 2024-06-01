@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Feature;
+namespace App\Stadium\Tests;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
-class StadiumTest extends TestCase
+class StadiumApiTest extends TestCase
 {
     const API_ROUTE = '/api/v1/stadiums';
 
