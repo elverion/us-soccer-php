@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class Stadium extends Model
 {
     public function __construct(
-        public string $name,
-        public Location $location,
-        public Weather $weather,
+        public readonly string $name,
+        public readonly Location $location,
+        public readonly Weather $weather,
     ) {
     }
 }

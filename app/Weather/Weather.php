@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Weather extends Model
 {
     public function __construct(
-        public float $temp,
-        public string $description,
+        public readonly float $temp,
+        public readonly string $description,
     ) {
     }
 }
