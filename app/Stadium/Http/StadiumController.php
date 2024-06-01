@@ -2,7 +2,7 @@
 
 namespace App\Stadium\Http;
 
-use App\Http\Controllers\Controller;
+use App\System\Http\Controllers\Controller;
 use App\Location\Location;
 use App\Stadium\Http\Requests\PostStadiumsRequest;
 use App\Stadium\Stadium;
