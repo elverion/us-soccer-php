@@ -2,8 +2,9 @@
 
 namespace App\Stadium\Validation;
 
-use Illuminate\Support\Str;
 use App\Validation\ValidationResult;
+use App\System\Traits\ParsesCsv;
+use App\Stadium\Data\StadiumCsvProcessor;
 
 /**
  * Validates the given contents (as a `string`) is a valid stadium CSV.
@@ -16,11 +17,7 @@ use App\Validation\ValidationResult;
  */
 class StadiumCsvValidator
 {
-    const HEADER_STADIUM = 'Stadium';
-    const HEADER_CITY = 'City';
-    const HEADER_COUNTRY = 'Country';
-    const HEADER_LATITUDE = 'Latitude';
-    const HEADER_LONGITUDE = 'Longitude';
+    use ParsesCsv;
 
     /**
      * Run the validation against a string.
@@ -40,45 +37,45 @@ class StadiumCsvValidator
         }
 
         $headerColumns = static::splitBySeparator($lines[0]);
-        $stadiumIndex = array_search(static::HEADER_STADIUM, $headerColumns);
-        $cityIndex = array_search(static::HEADER_CITY, $headerColumns);
-        $countryIndex = array_search(static::HEADER_COUNTRY, $headerColumns);
-        $latitudeIndex = array_search(static::HEADER_LATITUDE, $headerColumns);
-        $longitudeIndex = array_search(static::HEADER_LONGITUDE, $headerColumns);
+        $stadiumIndex = array_search(StadiumCsvProcessor::HEADER_STADIUM, $headerColumns);
+        $cityIndex = array_search(StadiumCsvProcessor::HEADER_CITY, $headerColumns);
+        $countryIndex = array_search(StadiumCsvProcessor::HEADER_COUNTRY, $headerColumns);
+        $latitudeIndex = array_search(StadiumCsvProcessor::HEADER_LATITUDE, $headerColumns);
+        $longitudeIndex = array_search(StadiumCsvProcessor::HEADER_LONGITUDE, $headerColumns);
 
         // Check all required headers are present
         if (!$stadiumIndex) {
             return new ValidationResult(
                 false,
-                static::fmtMissingRequiredHeaderError(static::HEADER_STADIUM)
+                static::fmtMissingRequiredHeaderError(StadiumCsvProcessor::HEADER_STADIUM)
             );
         }
 
         if (!$cityIndex) {
             return new ValidationResult(
                 false,
-                static::fmtMissingRequiredHeaderError(static::HEADER_CITY)
+                static::fmtMissingRequiredHeaderError(StadiumCsvProcessor::HEADER_CITY)
             );
         }
 
         if (!$countryIndex) {
             return new ValidationResult(
                 false,
-                static::fmtMissingRequiredHeaderError(static::HEADER_COUNTRY)
+                static::fmtMissingRequiredHeaderError(StadiumCsvProcessor::HEADER_COUNTRY)
             );
         }
 
         if (!$latitudeIndex) {
             return new ValidationResult(
                 false,
-                static::fmtMissingRequiredHeaderError(static::HEADER_LATITUDE)
+                static::fmtMissingRequiredHeaderError(StadiumCsvProcessor::HEADER_LATITUDE)
             );
         }
 
         if (!$longitudeIndex) {
             return new ValidationResult(
                 false,
-                static::fmtMissingRequiredHeaderError(static::HEADER_LONGITUDE)
+                static::fmtMissingRequiredHeaderError(StadiumCsvProcessor::HEADER_LONGITUDE)
             );
         }
 
@@ -100,35 +97,35 @@ class StadiumCsvValidator
             if (!is_string($stadiumName)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_STADIUM, 'string', gettype($stadiumName), $stadiumName)
+                    static::fmtDataTypeError($index + 1, StadiumCsvProcessor::HEADER_STADIUM, 'string', gettype($stadiumName), $stadiumName)
                 );
             }
 
             if (!is_string($stadiumCity)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_CITY, 'string', gettype($stadiumCity), $stadiumCity)
+                    static::fmtDataTypeError($index + 1, StadiumCsvProcessor::HEADER_CITY, 'string', gettype($stadiumCity), $stadiumCity)
                 );
             }
 
             if (!is_string($stadiumCountry)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_COUNTRY, 'string', gettype($stadiumCountry), $stadiumCountry)
+                    static::fmtDataTypeError($index + 1, StadiumCsvProcessor::HEADER_COUNTRY, 'string', gettype($stadiumCountry), $stadiumCountry)
                 );
             }
 
             if (!is_numeric($stadiumLat)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_LATITUDE, 'float', gettype($stadiumLat), $stadiumLat)
+                    static::fmtDataTypeError($index + 1, StadiumCsvProcessor::HEADER_LATITUDE, 'float', gettype($stadiumLat), $stadiumLat)
                 );
             }
 
             if (!is_numeric($stadiumLong)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_LONGITUDE, 'float', gettype($stadiumLong), $stadiumLong)
+                    static::fmtDataTypeError($index + 1, StadiumCsvProcessor::HEADER_LONGITUDE, 'float', gettype($stadiumLong), $stadiumLong)
                 );
             }
 
@@ -143,28 +140,6 @@ class StadiumCsvValidator
 
         // Begin recursion at line 1
         return $processNextLine(1, $lines);
-    }
-
-    /**
-     * Explodes a string by line. Accepts either "\r\n" or "\n" as lines.
-     * Returns false if no lines could be split.
-     */
-    #[Pure]
-    protected static function splitByLine(string $contents): false|array
-    {
-        return preg_split('/\n|\r\n/', $contents);
-    }
-
-    /**
-     * Like explode()-ing by a separator, but also handles trimming whitespace on each item
-     */
-    #[Pure]
-    protected static function splitBySeparator(string $line, string $seperator = ','): array
-    {
-        return Str::of($line)
-            ->explode($seperator)
-            ->map(fn ($item) => trim($item))
-            ->toArray();
     }
 
     /**
