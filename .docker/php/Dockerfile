@@ -21,6 +21,7 @@ WORKDIR /var/www
 
 COPY . /var/www
 COPY ./.docker/entrypoint.sh /entrypoint.sh
+COPY ./.docker/php/php.ini /usr/local/etc/php/conf.d/local.ini
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

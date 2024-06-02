@@ -10,7 +10,6 @@ services:
       DB_CONNECTION: ${DB_CONNECTION:-sqlite}
     volumes:
       - ./:/var/www
-      - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - backend
 
