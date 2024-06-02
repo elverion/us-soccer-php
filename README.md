@@ -1,93 +1,143 @@
 # us-soccer-test
 
+## Tools and considerations
 
+- Laravel - Most popular framework, production-ready, modern, and flexible.
+- SQLite - lightest, easiest-to-use solution for the purposes of a code test, though obviously not ideal for a production system
+  - Auto-increment IDs were used. This is a point of contention for many, but... this is a simple code test.
+  - Location could be separated out into a separate DB table. Again, given that this is only a code test,
+  and how closely the stadium's location is tied to the stadium itself for this usecase, I'm opting to
+  just store it in a single table for now, although we will expose it as if it were a nested object in the REST API.
 
-## Getting started
+## Project layout - where to find what you're looking for
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Given the requirements (DDD, functional programming, etc.), this project's structure may be quite different from what you are
+used to seeing with Laravel. The core Laravel concerns have been moved from `app/` to `app/System`. Project domains, such
+as `Stadium`, can be directly located under `app/` (ex: `app/Stadium`). Each domain will contain all business logic for
+that domain, plus tests.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Under the `database` directory, you may find `database.sqlite` (if the SQLite database has been created -- automatic at startup),
+as well as `migrations`. These database migration files contain imperitive instructions for creating the various database tables used.
 
-## Add your files
+The `.docker` directory contains files needed for building or configuring Docker layers and images, or to volume-mount as configurations
+at runtime. Take, for example, nginx's `default.conf` which is volume-mounted at runtime: this is fine for development, but
+probably should be baked-in to the image for a production environment; beyond the scope of this code test. The `entrypoint.sh`
+is bound to root (`/`), and is used in place of hard-coding the container's command (`CMD`); a common pattern to ensure flexibility
+for the future.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Style guidelines
 
+To conform closely to recommended PHP style guidelines, and that of the framework (Laravel) used, camel-casing is used largely throughout
+the project. However, code dealing with REST API or database specifics, snake casing may be used to better align with those
+external expectations.
+
+Additionally, to prevent confusion, the naming of certain DDD concepts follow the Laravel naming convention rather than the
+more general, widely-accepted DDD names. For example: Entities = Models, ValueObject = *Data, Interface = Contract, etc.
+
+Finally, in regards to DDD, the _original_ concept is followed here in order to group logical pieces of an entity.
+
+## Set up
+
+For your convenience, this project was wrapped in a Docker container. We will assume you've already got Docker (or similar container runtime) installed.
+
+If you've also got `docker-compose` installed (recommended):
+
+```sh
+docker-compose up
 ```
-cd existing_repo
-git remote add origin https://git.garnetnetwork.com/garnet/us-soccer-test.git
-git branch -M main
-git push -uf origin main
+
+Alternatively, using raw Docker:
+
+```sh
+docker network create backend
+
+# Build and run the app, attach to the network so it is reachable by nginx
+docker build -t app_image -f .docker/php/Dockerfile .
+
+docker run --rm -d \
+  --name app \
+  --network backend \
+  -w /var/www \
+  -e DB_CONNECTION=${DB_CONNECTION:-sqlite} \
+  -v $(pwd):/var/www \
+  app_image
+
+# Start nginx container listening on port 8080
+docker run -d \
+  --name nginx \
+  --network backend \
+  -w /var/www \
+  -v $(pwd):/var/www \
+  -v $(pwd)/.docker/nginx/conf.d:/etc/nginx/conf.d/ \
+  -p 8080:80 \
+  nginx:alpine
 ```
 
-## Integrate with your tools
+## Ingesting CSV data
 
-- [ ] [Set up project integrations](https://git.garnetnetwork.com/garnet/us-soccer-test/-/settings/integrations)
+You have two options for ingesting a Stadiums CSV file into the system:
 
-## Collaborate with your team
+1. Upload file via API
+2. Read from CLI
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Either option will, essentially, result in the same behavior. The contents of the file will be validated,
+then ingested into the database. Once ingested into the system, the stadiums may be accessed via the
+REST API.
 
-## Test and Deploy
+Download a file for testing file:
 
-Use the built-in continuous integration in GitLab.
+```sh
+curl --remote-name https://raw.githubusercontent.com/jokecamp/FootballData/master/other/stadiums-with-GPS-coordinates.csv
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### Upload file via API
 
-***
+Next, you need simply to POST the file to the `api/v1/stadiums` endpoint, key the file by `stadiums`. Example:
 
-# Editing this README
+```sh
+curl --location 'http://127.0.0.1:8080/api/v1/stadiums' \
+--header 'Accept: application/json' \
+--form 'stadiums=@"stadiums-with-GPS-coordinates.csv"'
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Read from CLI
 
-## Suggestions for a good README
+todo
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+#### If running from the host machine (assumes PHP 8.2 installed, ran `composer install`, etc.)
 
-## Name
-Choose a self-explaining name for your project.
+```sh
+php artisan <command name goes here>
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+#### Run on container (no dependencies needed on host)
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```sh
+# Download the file into the container
+docker exec -it app curl --remote-name https://raw.githubusercontent.com/jokecamp/FootballData/master/other/stadiums-with-GPS-coordinates.csv
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+# Run the Artisan command to being processing it
+docker exec -it app curl php artisan <command name goes here>
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Hitting the API
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+todo
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## Running tests
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+On the host machine (assumes you've got PHP 8.2 installed, ran `composer install`, etc.):
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```sh
+php artisan test
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Or, you can run tests within the container (don't need dependencies on host):
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+```sh
+docker exec -it app php artisan test
+```
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Limitations
 
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+todo
