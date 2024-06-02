@@ -4,13 +4,15 @@ services:
     build:
       context: .
       dockerfile: .docker/php/Dockerfile
-    container_name: laravel-app
+    container_name: app
     working_dir: /var/www
+    environment:
+      DB_CONNECTION: ${DB_CONNECTION:-sqlite}
     volumes:
       - ./:/var/www
       - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - laravel
+      - backend
 
   nginx:
     image: nginx:alpine
@@ -22,7 +24,7 @@ services:
     ports:
       - "8080:80"
     networks:
-      - laravel
+      - backend
 
 networks:
-  laravel:
+  backend:
