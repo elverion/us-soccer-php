@@ -2,6 +2,7 @@
 
 namespace App\Stadium;
 
+use App\Stadium\Repositories\{EloquentStadiumRepository, StadiumRepositoryContract};
 use Illuminate\Support\ServiceProvider;
 
 class StadiumServiceProvider extends ServiceProvider
@@ -12,6 +13,8 @@ class StadiumServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->loadRoutesFrom(__DIR__ . '/Http/routes/api.php');
+
+        $this->app->bind(StadiumRepositoryContract::class, EloquentStadiumRepository::class);
     }
 
     /**
@@ -19,6 +22,5 @@ class StadiumServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
     }
 }
