@@ -37,14 +37,34 @@ class StadiumCsvValidatorTest extends TestCase
         $this->assertFalse($result->success);
     }
 
-    public function test_invalid_data_causes_fail(): void
-    {
-        // 'Latitude' and 'Longitude' should be floats, not strings
-        $csv = <<<CSV
-        Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
-        Arsenal ,Arsenal,London ,Emirates Stadium ,60361,latitude_goes_here,longitude_goes_here,England
-        CSV;
 
+    public static function invalidDataLinesProvider(): array
+    {
+        return [
+            [/*'Latitude' and 'Longitude' should be floats, not strings */<<<CSV
+            Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
+            Arsenal ,Arsenal,London ,Emirates Stadium ,60361,latitude_goes_here,longitude_goes_here,England
+            CSV],
+            [/* the latitude is prefixed with an 'a' */
+                <<<CSV
+            Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
+            Arsenal ,Arsenal,London ,Emirates Stadium ,60361,a99.9999,-0.108611,England
+            CSV
+            ],
+            [/* Missing some fields */
+                <<<CSV
+            Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
+            Arsenal ,Arsenal,London ,Emirates Stadium
+            CSV
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDataLinesProvider
+     */
+    public function test_invalid_data_causes_fail($csv): void
+    {
         $result = StadiumCsvValidator::validate($csv);
         $this->assertFalse($result->success);
     }

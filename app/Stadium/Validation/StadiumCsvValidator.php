@@ -35,7 +35,7 @@ class StadiumCsvValidator
         if (!$lines || count($lines) <= 1) { // We expect >= 2 lines; 1 line for header, plus any content
             return new ValidationResult(
                 false,
-                'The :attribute file does not contain a properly-formatted CSV; requires headers plus content, separated by newline'
+                ':attribute does not contain a properly-formatted CSV; requires headers plus content, separated by newline'
             );
         }
 
@@ -90,40 +90,45 @@ class StadiumCsvValidator
          */
         $processNextLine = function ($index, $lines) use (&$processNextLine, $stadiumIndex, $cityIndex, $countryIndex, $latitudeIndex, $longitudeIndex): ValidationResult {
             $columns = static::splitBySeparator($lines[$index]);
+            $stadiumName = $columns[$stadiumIndex] ?? null;
+            $stadiumCity = $columns[$cityIndex] ?? null;
+            $stadiumCountry = $columns[$countryIndex] ?? null;
+            $stadiumLat = $columns[$latitudeIndex] ?? null;
+            $stadiumLong = $columns[$longitudeIndex] ?? null;
 
             // Ensure that columns follow expected data type
-            if (!is_string($columns[$stadiumIndex])) {
+            if (!is_string($stadiumName)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_STADIUM, 'string', gettype($columns[$stadiumIndex]))
+                    static::fmtDataTypeError($index + 1, static::HEADER_STADIUM, 'string', gettype($stadiumName), $stadiumName)
                 );
             }
 
-            if (!is_string($columns[$cityIndex])) {
+            if (!is_string($stadiumCity)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_CITY, 'string', gettype($columns[$cityIndex]))
+                    static::fmtDataTypeError($index + 1, static::HEADER_CITY, 'string', gettype($stadiumCity), $stadiumCity)
                 );
             }
 
-            if (!is_string($columns[$countryIndex])) {
+            if (!is_string($stadiumCountry)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_COUNTRY, 'string', gettype($columns[$countryIndex]))
+                    static::fmtDataTypeError($index + 1, static::HEADER_COUNTRY, 'string', gettype($stadiumCountry), $stadiumCountry)
                 );
             }
 
-            if (!is_numeric($columns[$longitudeIndex])) {
+            if (!is_numeric($stadiumLat)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_LONGITUDE, 'float', gettype($columns[$longitudeIndex]), $columns[$longitudeIndex])
+                    static::fmtDataTypeError($index + 1, static::HEADER_LATITUDE, 'float', gettype($stadiumLat), $stadiumLat)
                 );
             }
 
-            if (!is_string($columns[$latitudeIndex])) {
+            if (!is_numeric($stadiumLong)) {
                 return new ValidationResult(
                     false,
-                    static::fmtDataTypeError($index + 1, static::HEADER_LATITUDE, 'float', gettype($columns[$latitudeIndex]), $columns[$latitudeIndex])
+                    static::fmtDataTypeError($index + 1, static::HEADER_LONGITUDE, 'float', gettype($stadiumLong), $stadiumLong)
                 );
             }
 
@@ -168,7 +173,7 @@ class StadiumCsvValidator
     #[Pure]
     protected static function fmtMissingRequiredHeaderError(string $headerName): string
     {
-        return "The :attribute is missing the `{$headerName}` column.";
+        return ":attribute is missing the `{$headerName}` column.";
     }
 
     /**
