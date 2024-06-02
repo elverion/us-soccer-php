@@ -2,16 +2,19 @@
 
 namespace App\Stadium;
 
-use App\Location\Location;
-use App\Weather\Weather;
+use App\Stadium\StadiumData;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $city
+ * @property string $country
+ * @property float $lat
+ * @property float $long
+ */
 class Stadium extends Model
 {
-    public function __construct(
-        public readonly string $name,
-        public readonly Location $location,
-        public readonly Weather $weather,
-    ) {
-    }
+    protected $dataClass = StadiumData::class;
+    protected $table = 'stadiums';
 }

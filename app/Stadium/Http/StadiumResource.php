@@ -2,7 +2,6 @@
 
 namespace App\Stadium\Http;
 
-use App\Location\Http\LocationResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,7 +21,12 @@ class StadiumResource extends JsonResource
 
         return [
             'stadium' => $this->name,
-            'location' => new LocationResource($this->location),
+            'location' => [
+                'city' => $this->city,
+                'country' => $this->country,
+                'lat' => $this->lat,
+                'long' => $this->long,
+            ],
             'weather' => new WeatherResource($this->weather),
         ];
     }
