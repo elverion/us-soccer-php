@@ -19,7 +19,7 @@ class StoreStadiumsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stadiums' => [
+            'csv' => [
                 'required',
                 File::types(['csv']),
                 new StadiumCsvRule(),

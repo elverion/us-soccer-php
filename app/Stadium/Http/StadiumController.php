@@ -43,13 +43,13 @@ class StadiumController extends Controller
     /**
      * Process uploaded CSV and enrich response with weather data.
      * 
-     * User is expected to have uploaded a file, keyed as `stadiums`
+     * User is expected to have uploaded a file, keyed as `csv`
      */
     public function store(StoreStadiumsRequest $request): JsonResponse
     {
         // todo: handle the input from the request, return real response
         /** @var UploadedFile $file */
-        $file = $request->stadiums;
+        $file = $request->csv;
 
         StadiumCsvProcessor::process($file->getContent(), function (StadiumData $data) {
             $this->stadiumService->updateOrCreate($data);

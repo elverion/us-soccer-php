@@ -98,12 +98,12 @@ curl --remote-name https://raw.githubusercontent.com/jokecamp/FootballData/maste
 
 ### Upload file via API
 
-Next, you need simply to POST the file to the `api/v1/stadiums` endpoint, key the file by `stadiums`. Example:
+Next, you need simply to POST the file to the `api/v1/stadiums` endpoint, key the file by `csv`. Example:
 
 ```sh
 curl --location 'http://127.0.0.1:8080/api/v1/stadiums' \
 --header 'Accept: application/json' \
---form 'stadiums=@"stadiums-with-GPS-coordinates.csv"'
+--form 'csv=@"stadiums-with-GPS-coordinates.csv"'
 ```
 
 ### Read from CLI

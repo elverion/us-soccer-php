@@ -46,7 +46,7 @@ class StadiumApiTest extends DatabaseTestCase
     }
 
     /**
-     * If a valid CSV was provided, we expect a 200 response with enriched data
+     * If a valid CSV was provided, we expect a 200 response
      */
     public function test_can_post_stadium_endpoint(): void
     {
@@ -60,9 +60,8 @@ Blackburn Rovers,Blackburn,Blackburn,Ewood Park,31154,53.728611,-2.489167,Englan
 CSV
         );
 
-        $response = $this->postJson(static::API_ROUTE, ['stadiums' => $csv]);
+        $response = $this->postJson(static::API_ROUTE, ['csv' => $csv]);
         $response->assertOk();
-        // todo: verify resulting data
     }
 
     /**
