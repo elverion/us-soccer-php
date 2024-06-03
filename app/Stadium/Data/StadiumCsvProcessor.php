@@ -2,6 +2,7 @@
 
 namespace App\Stadium\Data;
 
+use App\Stadium\StadiumData;
 use Closure;
 use App\System\Traits\ParsesCsv;
 
@@ -20,14 +21,7 @@ class StadiumCsvProcessor
      * 
      * This assumes the file has already been validated!
      * Each data line within the file will be passed to the given `$lineHandler` closure.
-     * Your closure should expect to receive an array of the columns shaped like:
-     * [
-     *      "Stadium" => "Emirates Stadium",
-     *      "City" => "London",
-     *      "Country" => "England",
-     *      "Latitude" => 51.555,
-     *      "Longitude" => -0.108611
-     * ]
+     * Your closure should expect to receive a `StadiumData` representing that lines' data.
      */
     #[Pure]
     public static function process(string $csvContents, Closure $lineHandler)
@@ -47,15 +41,15 @@ class StadiumCsvProcessor
          */
         $processNextLine = function ($index, $lines) use (&$processNextLine, $lineHandler, $stadiumIndex, $cityIndex, $countryIndex, $latitudeIndex, $longitudeIndex) {
             $columns = static::splitBySeparator($lines[$index]);
-            $keyedColumns = [
-                static::HEADER_STADIUM => $columns[$stadiumIndex],
-                static::HEADER_CITY => $columns[$cityIndex],
-                static::HEADER_COUNTRY => $columns[$countryIndex],
-                static::HEADER_LATITUDE => $columns[$latitudeIndex],
-                static::HEADER_LONGITUDE => $columns[$longitudeIndex],
-            ];
+            $stadiumData = new StadiumData(
+                name: $columns[$stadiumIndex],
+                city: $columns[$cityIndex],
+                country: $columns[$countryIndex],
+                lat: $columns[$latitudeIndex],
+                long: $columns[$longitudeIndex],
+            );
 
-            $lineHandler($keyedColumns);
+            $lineHandler($stadiumData);
 
             // Handle next line or exit if EOF
             if ($index < (count($lines) - 1) && !empty($lines[$index + 1])) {
