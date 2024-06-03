@@ -27,7 +27,7 @@ class StadiumResource extends JsonResource
                 'lat' => $this->lat,
                 'long' => $this->long,
             ],
-            'weather' => new WeatherResource($this->weather),
+            'weather' => $this->whenNotNull($this->weather, new WeatherResource($this->weather)),
         ];
     }
 }

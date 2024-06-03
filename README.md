@@ -128,7 +128,16 @@ docker exec -it app curl php artisan stadium:ingest stadiums-with-GPS-coordinate
 
 ## Hitting the API
 
-todo
+Fetch paginated stadiums:
+
+```sh
+curl --location 'http://127.0.0.1:8080/api/v1/stadiums'
+```
+
+You may optionall specify a page number. ex: `http://127.0.0.1:8080/api/v1/stadiums?page=1`
+
+Note: Just used default paginator behavior; the `meta` and `links` aren't really well-formed for an API,
+but... reshaping that is beyond the needs for this code test.
 
 ## Running tests
 

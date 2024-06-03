@@ -2,15 +2,48 @@
 
 namespace App\Stadium\Tests;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
-
+use App\Stadium\Stadium;
+use App\Weather\Api\WeatherApiClientContract;
+use App\Weather\WeatherData;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Mockery\MockInterface;
 use Tests\DatabaseTestCase;
 
 class StadiumApiTest extends DatabaseTestCase
 {
     const API_ROUTE = '/api/v1/stadiums';
+
+    /**
+     * Ensure that indexing the stadiums retuns a paginated list of stadiums.
+     * We mock the weather so we aren't fetching from a real external API.
+     */
+    public function test_can_index_stadiums(): void
+    {
+        /** @var WeatherApiClientContract $mockWeatherApiClient */
+        $mockWeatherApiClient = $this->mock(WeatherApiClientContract::class, function (MockInterface $mock) {
+            $mock->allows('fetchCurrent')->andReturn(new WeatherData(20.00, 'all good'));
+        });
+
+        // Seed some fake stadium data
+        $stadiums = Stadium::factory()->count(20)->create();
+
+        $response = $this->getJson(static::API_ROUTE);
+        $response->assertOk();
+        $response->assertJson(function (AssertableJson $json) {
+            $json->has('data.0', function (AssertableJson $json) {
+                $json->has('stadium')
+                    ->has('location')
+                    ->has('location.city')
+                    ->has('location.country')
+                    ->has('location.lat')
+                    ->has('location.long')
+                    ->has('weather.temp')
+                    ->has('weather.description');
+            });
+        });
+    }
 
     /**
      * If a valid CSV was provided, we expect a 200 response with enriched data
