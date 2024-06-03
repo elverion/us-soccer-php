@@ -25,6 +25,11 @@ probably should be baked-in to the image for a production environment; beyond th
 is bound to root (`/`), and is used in place of hard-coding the container's command (`CMD`); a common pattern to ensure flexibility
 for the future.
 
+For API requests, all validation is done through each endpoints' matching Request. This ensures that all validation has completed
+prior to handing off to the business side of things (the actual Controller). The Request may make use of custom validation Rules
+to make the logic more reusable.
+See `app/Stadium/Http/Requests/StoreStadiumRequest.php` and `app/Stadium/Validation/StadiumCsvRule.php` for example.
+
 ## Style guidelines
 
 To conform closely to recommended PHP style guidelines, and that of the framework (Laravel) used, camel-casing is used largely throughout
@@ -140,4 +145,4 @@ docker exec -it app php artisan test
 
 ## Limitations
 
-todo
+- No caching was used. This would not be hard to layer over top of the existing code, but is beyond the needs for this code test.

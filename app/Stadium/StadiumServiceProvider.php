@@ -12,7 +12,7 @@ class StadiumServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->loadRoutesFrom(__DIR__ . '/Http/routes/api.php');
+        $this->loadRoutesFrom(__DIR__ . '/Http/Routes/api.php');
 
         $this->app->bind(StadiumRepositoryContract::class, EloquentStadiumRepository::class);
     }

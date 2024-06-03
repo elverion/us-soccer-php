@@ -4,10 +4,11 @@ namespace App\Stadium\Tests;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
-use Tests\TestCase;
+use Tests\DatabaseTestCase;
 
-class StadiumApiTest extends TestCase
+class StadiumApiTest extends DatabaseTestCase
 {
     const API_ROUTE = '/api/v1/stadiums';
 
@@ -25,9 +26,9 @@ Aston Villa,Aston Villa,Birmingham,Villa Park,42785,52.509167,-1.884722,England
 Blackburn Rovers,Blackburn,Blackburn,Ewood Park,31154,53.728611,-2.489167,England
 CSV
         );
-        $response = $this->postJson(static::API_ROUTE, ['stadiums' => $csv]);
 
-        $response->assertStatus(200);
+        $response = $this->postJson(static::API_ROUTE, ['stadiums' => $csv]);
+        $response->assertOk();
         // todo: verify resulting data
     }
 
@@ -37,8 +38,7 @@ CSV
     public function test_cannot_post_stadium_endpoint_without_csv_file(): void
     {
         $response = $this->postJson(static::API_ROUTE);
-
-        $response->assertStatus(422); // 422 = Validation error
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY); // 422 = Validation error
     }
 
     /**
@@ -54,8 +54,8 @@ CSV
             Aston Villa 42785,52.509167
             CSV
         );
-        $response = $this->postJson(static::API_ROUTE, ['stadiums' => $csv]);
 
-        $response->assertStatus(422); // 422 = Validation error
+        $response = $this->postJson(static::API_ROUTE, ['stadiums' => $csv]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY); // 422 = Validation error
     }
 }
