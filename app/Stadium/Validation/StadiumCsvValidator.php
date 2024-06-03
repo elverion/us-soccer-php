@@ -122,10 +122,24 @@ class StadiumCsvValidator
                 );
             }
 
+            if ($stadiumLat < -90 || $stadiumLat > 90) {
+                return new ValidationResult(
+                    false,
+                    static::fmtDataDomainError($index + 1, StadiumCsvProcessor::HEADER_LATITUDE, '-90 to 90', $stadiumLat)
+                );
+            }
+
             if (!is_numeric($stadiumLong)) {
                 return new ValidationResult(
                     false,
                     static::fmtDataTypeError($index + 1, StadiumCsvProcessor::HEADER_LONGITUDE, 'float', gettype($stadiumLong), $stadiumLong)
+                );
+            }
+
+            if ($stadiumLong < -180 || $stadiumLong > 180) {
+                return new ValidationResult(
+                    false,
+                    static::fmtDataDomainError($index + 1, StadiumCsvProcessor::HEADER_LONGITUDE, '-180 to 180', $stadiumLong)
                 );
             }
 
@@ -157,6 +171,17 @@ class StadiumCsvValidator
     #[Pure]
     protected static function fmtDataTypeError(int $line, string $columnName, string $expectedType, string $actualType, $value = 'null'): string
     {
-        return "Invalid data for column `{$columnName}` on line {$line}. Expected {$expectedType}, got {$actualType}: {$value}";
+        $strValRepr = strval($value);
+        return "Invalid data type for column `{$columnName}` on line {$line}. Expected {$expectedType}, got {$actualType}: {$strValRepr}";
+    }
+
+    /**
+     * Helper function to format a domain error
+     */
+    #[Pure]
+    protected static function fmtDataDomainError(int $line, string $columnName, string $expectedDomain, $value = 'null'): string
+    {
+        $strValRepr = strval($value);
+        return "Invalid data for column `{$columnName}` on line {$line}. Expected {$expectedDomain}, got {$strValRepr}";
     }
 }

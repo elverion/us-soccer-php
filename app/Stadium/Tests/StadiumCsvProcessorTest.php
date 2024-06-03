@@ -4,6 +4,7 @@ namespace App\Stadium\Tests;
 
 use App\Stadium\Data\StadiumCsvProcessor;
 use PHPUnit\Framework\TestCase;
+use App\Stadium\StadiumData;
 
 class StadiumCsvProcessorTest extends TestCase
 {
@@ -19,22 +20,22 @@ class StadiumCsvProcessorTest extends TestCase
         // so that we can verify the contents match the expectations.
         $received = [];
         $count = 0;
-        $handler = function ($row) use (&$received, &$count) {
-            $received[$count] = $row;
+        $handler = function (StadiumData $data) use (&$received, &$count) {
+            $received[$count] = $data;
             $count++;
         };
 
         $result = StadiumCsvProcessor::process($csv, $handler);
-        $this->assertSame('Emirates Stadium', $received[0][StadiumCsvProcessor::HEADER_STADIUM]);
-        $this->assertSame('London', $received[0][StadiumCsvProcessor::HEADER_CITY]);
-        $this->assertSame('England', $received[0][StadiumCsvProcessor::HEADER_COUNTRY]);
-        $this->assertSame('51.555', $received[0][StadiumCsvProcessor::HEADER_LATITUDE]);
-        $this->assertSame('-0.108611', $received[0][StadiumCsvProcessor::HEADER_LONGITUDE]);
+        $this->assertSame('Emirates Stadium', $received[0]->name);
+        $this->assertSame('London', $received[0]->city);
+        $this->assertSame('England', $received[0]->country);
+        $this->assertSame(51.555, $received[0]->lat);
+        $this->assertSame(-0.108611, $received[0]->long);
 
-        $this->assertSame('Villa Park', $received[1][StadiumCsvProcessor::HEADER_STADIUM]);
-        $this->assertSame('Birmingham', $received[1][StadiumCsvProcessor::HEADER_CITY]);
-        $this->assertSame('England', $received[1][StadiumCsvProcessor::HEADER_COUNTRY]);
-        $this->assertSame('52.509167', $received[1][StadiumCsvProcessor::HEADER_LATITUDE]);
-        $this->assertSame('-1.884722', $received[1][StadiumCsvProcessor::HEADER_LONGITUDE]);
+        $this->assertSame('Villa Park', $received[1]->name);
+        $this->assertSame('Birmingham', $received[1]->city);
+        $this->assertSame('England', $received[1]->country);
+        $this->assertSame(52.509167, $received[1]->lat);
+        $this->assertSame(-1.884722, $received[1]->long);
     }
 }

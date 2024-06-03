@@ -48,13 +48,25 @@ class StadiumCsvValidatorTest extends TestCase
             [/* the latitude is prefixed with an 'a' */
                 <<<CSV
             Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
-            Arsenal ,Arsenal,London ,Emirates Stadium ,60361,a99.9999,-0.108611,England
+            Arsenal ,Arsenal,London ,Emirates Stadium ,60361,a51.555,-0.108611,England
             CSV
             ],
             [/* Missing some fields */
                 <<<CSV
             Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
             Arsenal ,Arsenal,London ,Emirates Stadium
+            CSV
+            ],
+            [/* Latitude is outside of range */
+                <<<CSV
+            Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
+            Arsenal ,Arsenal,London ,Emirates Stadium ,60361,91.000,-0.108611,England
+            CSV
+            ],
+            [/* Longitude is outside of range */
+                <<<CSV
+            Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country
+            Arsenal ,Arsenal,London ,Emirates Stadium ,60361,51.555,-190,England
             CSV
             ],
         ];
