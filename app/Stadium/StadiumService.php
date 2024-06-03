@@ -3,6 +3,7 @@
 namespace App\Stadium;
 
 use App\Stadium\Repositories\StadiumRepositoryContract;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Note to reviewers: This class seems pretty dumb at first glance
@@ -24,6 +25,12 @@ class StadiumService
         return $this->stadiumRepository->create($data);
     }
 
+    public function updateOrCreate(
+        StadiumData $data,
+    ): Stadium {
+        return $this->stadiumRepository->updateOrCreate($data);
+    }
+
     public function getById(int $id): ?Stadium
     {
         return $this->stadiumRepository->getById($id);
@@ -37,5 +44,10 @@ class StadiumService
     public function delete(int $id): void
     {
         $this->stadiumRepository->delete($id);
+    }
+
+    public function getPaginatedList(int $page, int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->stadiumRepository->getPaginatedList($page, $perPage);
     }
 }

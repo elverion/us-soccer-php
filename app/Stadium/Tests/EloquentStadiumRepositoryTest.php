@@ -46,6 +46,33 @@ class EloquentStadiumRepositoryTest extends DatabaseTestCase
     }
 
     /**
+     * Use updateOrCreate() to both update and create
+     */
+    public function test_can_update_or_create_stadium(): void
+    {
+        $this->repo = app()->make(EloquentStadiumRepository::class);
+
+        $data = new StadiumData(
+            name: static::STADIUM_NAME,
+            city: static::STADIUM_CITY,
+            country: static::STADIUM_COUNTRY,
+            lat: static::STADIUM_LAT,
+            long: static::STADIUM_LONG,
+        );
+        $origStadium = $this->repo->updateOrCreate($data);
+        $this->assertInstanceOf(Stadium::class, $origStadium);
+        $this->assertSame(static::STADIUM_LAT, $origStadium->lat);
+        $this->assertSame(static::STADIUM_LONG, $origStadium->long);
+
+        $data->lat = 11.11;
+        $data->long = 22.22;
+        $updatedStadium = $this->repo->updateOrCreate($data);
+        $this->assertSame($origStadium->getKey(), $updatedStadium->getKey()); // IDs should match
+        $this->assertSame(11.11, $updatedStadium->lat);
+        $this->assertSame(22.22, $updatedStadium->long);
+    }
+
+    /**
      * Assuming we have a previously-created stadium, can we read it?
      */
     public function test_can_read_stadium(): void

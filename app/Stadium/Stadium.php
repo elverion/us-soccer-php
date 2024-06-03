@@ -3,6 +3,7 @@
 namespace App\Stadium;
 
 use App\Stadium\StadiumData;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -15,6 +16,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Stadium extends Model
 {
+    use HasFactory;
+    
     protected $dataClass = StadiumData::class;
     protected $table = 'stadiums';
+
+    protected $guarded = ['id'];
 }
