@@ -28,5 +28,8 @@
 		<server name="DB_DATABASE" value=":memory:" />
 		<env name="TELESCOPE_ENABLED" value="false" />
 		<server name="TELESCOPE_ENABLED" value="false" />
+		<!-- Make sure we don't ever use real API keys in unit tests... -->
+		<env name="OPEN_WEATHER_API_KEY" value="" />
+		<server name="OPEN_WEATHER_API_KEY" value="" />
 	</php>
 </phpunit>

@@ -2,9 +2,9 @@
 
 namespace App\Weather;
 
-use Illuminate\Database\Eloquent\Model;
+use Spatie\LaravelData\Data;
 
-class Weather extends Model
+class WeatherData extends Data
 {
     public function __construct(
         public readonly float $temp,

@@ -170,6 +170,8 @@ return [
         App\System\Providers\RouteServiceProvider::class,
 
         App\Stadium\StadiumServiceProvider::class,
+        App\Weather\WeatherServiceProvider::class,
+        
     ])->toArray(),
 
     /*
