@@ -27,7 +27,8 @@ for the future.
 
 For API requests, all validation is done through each endpoints' matching Request. This ensures that all validation has completed
 prior to handing off to the business side of things (the actual Controller). The Request may make use of custom validation Rules
-to make the logic more reusable.
+to make the logic more reusable. Requests can also ensure Authentication and Authorization; these concepts were skipped over
+for the purpose of this code test, but again would not be difficult to add in.
 See `app/Stadium/Http/Requests/StoreStadiumRequest.php` and `app/Stadium/Validation/StadiumCsvRule.php` for example.
 
 ## Style guidelines
@@ -146,3 +147,6 @@ docker exec -it app php artisan test
 ## Limitations
 
 - No caching was used. This would not be hard to layer over top of the existing code, but is beyond the needs for this code test.
+- OpenWeather free has an API limit of 60 requests/min. If you exceed that, weather data for stadiums will stop being returned.
+  - We obviously wouldn't use a free-tier API key for anything beyond a code test
+  - This would probably be cached in a production environment, and return the last-known weather if it couldn't be fetched real-time.
