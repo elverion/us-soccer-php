@@ -102,12 +102,12 @@ curl --location 'http://127.0.0.1:8080/api/v1/stadiums' \
 
 ### Read from CLI
 
-todo
-
 #### If running from the host machine (assumes PHP 8.2 installed, ran `composer install`, etc.)
 
+Assuming your CSV file is named `stadiums-with-GPS-coordinates.csv`:
+
 ```sh
-php artisan <command name goes here>
+php artisan stadium:ingest stadiums-with-GPS-coordinates.csv
 ```
 
 #### Run on container (no dependencies needed on host)
@@ -117,7 +117,7 @@ php artisan <command name goes here>
 docker exec -it app curl --remote-name https://raw.githubusercontent.com/jokecamp/FootballData/master/other/stadiums-with-GPS-coordinates.csv
 
 # Run the Artisan command to being processing it
-docker exec -it app curl php artisan <command name goes here>
+docker exec -it app curl php artisan stadium:ingest stadiums-with-GPS-coordinates.csv
 ```
 
 ## Hitting the API
