@@ -47,7 +47,6 @@ class StadiumController extends Controller
      */
     public function store(StoreStadiumsRequest $request): JsonResponse
     {
-        // todo: handle the input from the request, return real response
         /** @var UploadedFile $file */
         $file = $request->csv;
 
